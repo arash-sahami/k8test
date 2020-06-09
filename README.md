@@ -1,6 +1,6 @@
 # Problem
 Event though we have assigned all kind of permission to the service account in the yaml file, the call to `ReadNamespacedPodStatusAsync`
-fails probebly due to lack of previliges.
+fails due to lack of privileges.
 
 However the call to `DeleteNamespacedPodAsync` to delete an existing pod is successful.
 
