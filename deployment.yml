@@ -1,0 +1,72 @@
+﻿---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: default
+  name: abc
+
+---
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  namespace: default
+  name: abc
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["create","delete","get","list","patch","update","watch"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create","delete","get","list","patch","update","watch"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get","list","watch"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "watch", "list"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  namespace: default
+  name: abc
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: abc
+subjects:
+- kind: ServiceAccount
+  name: abc
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8test
+  labels:
+    app: k8test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8test
+  template:
+    metadata:
+      labels:
+        app: k8test
+    spec:
+      serviceAccountName: abc
+      nodeSelector:
+        kubernetes.io/os: windows
+      containers:
+      - name: k8test
+        image: arashazureregistry.azurecr.io/abb/k8test:latest
+        ports:
+        - containerPort: 80
